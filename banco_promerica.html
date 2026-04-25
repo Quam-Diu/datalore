@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco Promerica — Casos de Uso de IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.12.0"></script>
+
+<style>
+:root {
+  --primary:      #157347;
+  --primary-dark: #0f5c38;
+  --primary-mid:  #2d9662;
+  --primary-tint: #e6f2ec;
+  --bg:           #eef2f0;
+  --surface:      #ffffff;
+  --border:       #dde6e2;
+  --text-1:       #1b2e24;
+  --text-2:       #4a6b5a;
+  --text-3:       #8aaa98;
+  --accent-blue:  #0d6efd;
+  --accent-orange:#fd7e14;
+  --accent-purple:#6610f2;
+  --shadow-s: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-m: 0 4px 14px rgba(0,0,0,.08);
+  --r:    10px;
+  --r-sm: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text-1);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ──────────────────────────────────────────── */
+header {
+  background: linear-gradient(120deg, var(--primary-dark) 0%, var(--primary) 55%, var(--primary-mid) 100%);
+  color: #fff;
+  height: 58px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(15,92,56,.4);
+  position: relative;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.brand-icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: rgba(255,255,255,.18);
+  border: 1.5px solid rgba(255,255,255,.32);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800;
+  letter-spacing: -.5px;
+  flex-shrink: 0;
+}
+
+.brand-name { font-size: 14px; font-weight: 700; letter-spacing: -.2px; line-height: 1.2; }
+.brand-sub  { font-size: 10px; opacity: .65; font-weight: 400; }
+
+.header-center {
+  position: absolute;
+  left: 50%; transform: translateX(-50%);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: .5px; text-transform: uppercase;
+  opacity: .85;
+}
+
+.upload-wrapper { position: relative; }
+.upload-wrapper input[type="file"] {
+  position: absolute; inset: 0;
+  opacity: 0; cursor: pointer; width: 100%;
+}
+.upload-btn {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,.14);
+  border: 1.5px solid rgba(255,255,255,.32);
+  color: #fff;
+  padding: 7px 15px;
+  border-radius: var(--r-sm);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .3px;
+  transition: background .2s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.upload-wrapper:hover .upload-btn { background: rgba(255,255,255,.24); }
+
+.upload-btn svg { flex-shrink: 0; }
+
+/* ── MAIN LAYOUT ─────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  padding: 14px 16px;
+  gap: 14px;
+  min-height: 0;
+}
+
+.panel-left {
+  width: 43%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.panel-right {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── CARD ────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-s);
+}
+
+/* ── TABS ────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 4px;
+  box-shadow: var(--shadow-s);
+  width: fit-content;
+  flex-shrink: 0;
+  gap: 2px;
+}
+
+.tab {
+  font-size: 11px; font-weight: 500;
+  padding: 5px 16px;
+  border: none; background: transparent;
+  cursor: pointer;
+  border-radius: 7px;
+  color: var(--text-2);
+  font-family: inherit;
+  transition: all .18s;
+  letter-spacing: .2px;
+}
+.tab.active {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(21,115,71,.3);
+}
+
+/* ── CHART WRAP ──────────────────────────────────────── */
+.chart-wrap {
+  flex: 1;
+  min-height: 0;
+  padding: 12px 10px 8px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-wrap canvas {
+  flex: 1;
+  min-height: 0 !important;
+}
+
+/* ── FILTER PANEL ────────────────────────────────────── */
+.filter-panel {
+  padding: 10px 14px 12px;
+  flex-shrink: 0;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px 16px;
+}
+
+.filter-group { display: flex; flex-direction: column; gap: 5px; }
+
+.filter-label {
+  font-size: 8.5px; font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 1.1px;
+  display: flex; align-items: center; gap: 6px;
+}
+.filter-label::after {
+  content: ''; flex: 1; height: 1px;
+  background: var(--border);
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.chip {
+  font-size: 9.5px; font-weight: 500;
+  padding: 2px 9px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  color: var(--text-2);
+  background: var(--bg);
+  transition: all .15s;
+  line-height: 1.5;
+  user-select: none;
+}
+.chip:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-tint); }
+.chip.active { color: #fff; border-color: transparent; }
+
+/* ── DETAIL PANEL ────────────────────────────────────── */
+.detail-panel {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* scrollbar */
+.detail-panel::-webkit-scrollbar { width: 5px; }
+.detail-panel::-webkit-scrollbar-track { background: transparent; }
+.detail-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+/* ── EMPTY STATE ─────────────────────────────────────── */
+.empty-state {
+  height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 11px; color: var(--text-3);
+  padding: 24px;
+  text-align: center;
+}
+.empty-icon {
+  width: 56px; height: 56px;
+  background: var(--primary-tint);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary);
+}
+.empty-title { font-size: 13px; font-weight: 600; color: var(--text-2); }
+.empty-hint  { font-size: 11px; max-width: 220px; line-height: 1.6; }
+
+/* ── CASE DETAIL ─────────────────────────────────────── */
+.detail-header {
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(140deg, var(--primary-tint) 0%, rgba(230,242,236,0) 100%);
+  border-radius: var(--r) var(--r) 0 0;
+}
+.case-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--primary); color: #fff;
+  font-size: 9px; font-weight: 700;
+  padding: 2px 10px; border-radius: 20px;
+  letter-spacing: .6px; margin-bottom: 7px;
+  text-transform: uppercase;
+}
+.case-name {
+  font-size: 18px; font-weight: 700;
+  color: var(--text-1); line-height: 1.2;
+  letter-spacing: -.3px;
+}
+
+.detail-body {
+  padding: 14px 18px 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.info-card {
+  background: var(--bg);
+  border-radius: var(--r-sm);
+  padding: 10px 13px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+}
+.info-card.full   { grid-column: span 2; }
+.info-card.blue   { border-left-color: var(--accent-blue); }
+.info-card.orange { border-left-color: var(--accent-orange); }
+.info-card.purple { border-left-color: var(--accent-purple); }
+
+.info-label {
+  font-size: 8.5px; font-weight: 700;
+  color: var(--primary); text-transform: uppercase;
+  letter-spacing: .9px; margin-bottom: 5px;
+}
+.info-label.blue   { color: var(--accent-blue); }
+.info-label.orange { color: var(--accent-orange); }
+.info-label.purple { color: var(--accent-purple); }
+
+.info-value {
+  font-size: 12px; color: var(--text-1);
+  line-height: 1.55;
+}
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────── -->
+<header>
+  <div class="brand">
+    <div class="brand-icon">BP</div>
+    <div>
+      <div class="brand-name">Banco Promerica</div>
+      <div class="brand-sub">Inteligencia Artificial</div>
+    </div>
+  </div>
+
+  <div class="header-center">Casos de Uso · Mapa de Valor</div>
+
+  <div class="upload-wrapper">
+    <input type="file" id="file" accept=".xlsx,.xls">
+    <div class="upload-btn">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      Cargar Excel
+    </div>
+  </div>
+</header>
+
+<!-- ── MAIN ────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <div class="panel-left">
+
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab('bubble')">Mapa de Burbujas</button>
+      <button class="tab"        onclick="switchTab('sankey')">Diagrama de Flujo</button>
+    </div>
+
+    <div class="card chart-wrap" id="bubbleBox">
+      <canvas id="chart"></canvas>
+    </div>
+    <div class="card chart-wrap hidden" id="sankeyBox">
+      <canvas id="sankey"></canvas>
+    </div>
+
+    <div class="card filter-panel">
+      <div class="filter-grid">
+        <div class="filter-group">
+          <div class="filter-label">Dominio</div>
+          <div id="dom" class="chips"></div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Capacidad</div>
+          <div id="cap" class="chips"></div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Tipo IA</div>
+          <div id="tipo" class="chips"></div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Impacto</div>
+          <div id="flag" class="chips"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="panel-right">
+    <div class="card detail-panel" id="detail">
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+          </svg>
+        </div>
+        <div class="empty-title">Selecciona un caso de uso</div>
+        <div class="empty-hint">
+          Haz clic sobre una burbuja en el mapa o un nodo en el diagrama de flujo para ver el detalle completo.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let raw = [], chart, sankey;
+
+const palette = ["#157347","#0d6efd","#6610f2","#fd7e14","#dc3545","#20c997"];
+const cmap    = {};
+const filters = { Dominio: new Set(), Capacidad: new Set(), TipoIA: new Set(), Flags: new Set() };
+const flags   = ["↓ Gasto","↓ Riesgo","↑ Ingreso","↑ Cust. Exp."];
+
+const num = v => Number(String(v || "").replace(",", ".")) || 0;
+const fmt = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+function color(k) {
+  if (!cmap[k]) cmap[k] = palette[Object.keys(cmap).length % palette.length];
+  return cmap[k];
+}
+
+function rgba(h, a) {
+  const r = parseInt(h.substr(1,2), 16);
+  const g = parseInt(h.substr(3,2), 16);
+  const b = parseInt(h.substr(5,2), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* ── FILE LOAD ─────────────────────────────────────── */
+document.getElementById("file").onchange = e => {
+  const reader = new FileReader();
+  reader.onload = x => {
+    const wb = XLSX.read(new Uint8Array(x.target.result), { type: "array" });
+    raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+    buildChips();
+    draw();
+  };
+  reader.readAsArrayBuffer(e.target.files[0]);
+};
+
+/* ── FILTER ────────────────────────────────────────── */
+function data() {
+  return raw
+    .filter(r => num(r["Nota"]) > 0)
+    .filter(r => !filters.Dominio.size   || filters.Dominio.has(r["Dominio"]))
+    .filter(r => !filters.Capacidad.size || filters.Capacidad.has(r["Capacidad"]))
+    .filter(r => !filters.TipoIA.size    || filters.TipoIA.has(r["Tipo IA"]))
+    .filter(r => !filters.Flags.size     || [...filters.Flags].some(f => r[f] === "X"));
+}
+
+/* ── BUBBLE CHART ──────────────────────────────────── */
+function draw() {
+  const d = data();
+  const scale = v => Math.max(5, v * 25);
+  const grouped = {};
+
+  d.forEach(r => {
+    const k = r["Capacidad"];
+    if (!grouped[k]) grouped[k] = [];
+    grouped[k].push({
+      x: num(r["Factibilidad"]),
+      y: num(r["Valor Negocio"]),
+      r: scale(num(r["USD_Norm"])),
+      backgroundColor: rgba(color(k), 0.48),
+      borderColor: color(k),
+      row: r
+    });
+  });
+
+  const ds = Object.keys(grouped).map(k => ({
+    label: k,
+    data: grouped[k],
+    backgroundColor: rgba(color(k), 0.48),
+    borderColor: color(k),
+    borderWidth: 1.5
+  }));
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("chart"), {
+    type: "bubble",
+    data: { datasets: ds },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 700, easing: "easeOutQuart" },
+      plugins: {
+        legend: {
+          labels: {
+            font: { size: 10, family: "'Inter', system-ui" },
+            color: "#4a6b5a",
+            usePointStyle: true,
+            pointStyleWidth: 10,
+            padding: 12
+          }
+        },
+        zoom: {
+          pan:  { enabled: true, mode: "xy" },
+          zoom: { wheel: { enabled: true }, mode: "xy" }
+        },
+        tooltip: {
+          backgroundColor: "rgba(27,46,36,.93)",
+          titleFont: { size: 11, family: "'Inter', system-ui", weight: "600" },
+          bodyFont:  { size: 10, family: "'Inter', system-ui" },
+          padding: 10, cornerRadius: 7,
+          callbacks: {
+            label: c => {
+              const r = c.raw.row;
+              return `${r["Caso"]}  ·  $${fmt(num(r["Ingreso"]))}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0, max: 6,
+          title: { display: true, text: "Factibilidad",
+                   font: { size: 11, family: "'Inter', system-ui" }, color: "#8aaa98" },
+          grid:  { color: "rgba(0,0,0,.05)" },
+          ticks: { font: { size: 10 }, color: "#8aaa98" }
+        },
+        y: {
+          min: 0, max: 6,
+          title: { display: true, text: "Valor de Negocio",
+                   font: { size: 11, family: "'Inter', system-ui" }, color: "#8aaa98" },
+          grid:  { color: "rgba(0,0,0,.05)" },
+          ticks: { font: { size: 10 }, color: "#8aaa98" }
+        }
+      },
+      onClick: (e, el) => {
+        if (!el.length) return;
+        show(chart.data.datasets[el[0].datasetIndex].data[el[0].index].row);
+      }
+    },
+    plugins: [{
+      id: "quadrants",
+      afterDraw(c) {
+        const { ctx, scales: { x, y } } = c;
+        const mx = x.getPixelForValue(3);
+        const my = y.getPixelForValue(3);
+
+        ctx.save();
+        ctx.strokeStyle = "rgba(21,115,71,.3)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(mx, y.top);    ctx.lineTo(mx, y.bottom);
+        ctx.moveTo(x.left, my);   ctx.lineTo(x.right, my);
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+        ctx.font = "600 8.5px 'Inter', system-ui";
+        ctx.fillStyle = "rgba(21,115,71,.38)";
+        ctx.fillText("PRIORITARIOS",  mx + 7,     y.top + 13);
+        ctx.fillText("ESTRATÉGICOS",  x.left + 6, y.top + 13);
+        ctx.restore();
+      }
+    }]
+  });
+}
+
+/* ── SANKEY ────────────────────────────────────────── */
+function buildSankey() {
+  const d = data();
+
+  const links = d.map(r => {
+    const col = color(r["Capacidad"]);
+    return {
+      from:  r["Caso"],
+      to:    r["Capacidad"],
+      flow:  1,
+      color: ctx => {
+        const g = ctx.chart.ctx.createLinearGradient(0, 0, ctx.chart.width, 0);
+        g.addColorStop(0, "#157347");
+        g.addColorStop(1, col);
+        return g;
+      },
+      row: r
+    };
+  });
+
+  if (sankey) sankey.destroy();
+
+  sankey = new Chart(document.getElementById("sankey"), {
+    type: "sankey",
+    data: { datasets: [{ data: links }] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          titleFont: { size: 10, family: "'Inter', system-ui" },
+          bodyFont:  { size: 10, family: "'Inter', system-ui" },
+          backgroundColor: "rgba(27,46,36,.93)",
+          cornerRadius: 7
+        }
+      },
+      onClick: (e, el) => {
+        if (!el.length) return;
+        show(sankey.data.datasets[0].data[el[0].index].row);
+      }
+    }
+  });
+}
+
+/* ── DETAIL ────────────────────────────────────────── */
+function show(r) {
+  document.getElementById("detail").innerHTML = `
+    <div class="detail-header">
+      <div class="case-pill">Caso de Uso</div>
+      <div class="case-name">${r["Caso"] || "—"}</div>
+    </div>
+    <div class="detail-body">
+      <div class="info-card full">
+        <div class="info-label">Por qué queremos este caso</div>
+        <div class="info-value">${r["Por qué queremos el caso de uso"] || "—"}</div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Qué es</div>
+        <div class="info-value">${r["Qué es el caso de uso"] || "—"}</div>
+      </div>
+      <div class="info-card blue">
+        <div class="info-label blue">Salidas esperadas</div>
+        <div class="info-value">${r["Salidas esperadas"] || "—"}</div>
+      </div>
+      <div class="info-card orange">
+        <div class="info-label orange">Beneficio principal</div>
+        <div class="info-value">${r["Beneficio principal"] || "—"}</div>
+      </div>
+      <div class="info-card purple">
+        <div class="info-label purple">Beneficio cuantificado</div>
+        <div class="info-value">${r["Beneficio cuantificado (baseline → meta)"] || "—"}</div>
+      </div>
+      <div class="info-card full">
+        <div class="info-label">OKRs vinculados</div>
+        <div class="info-value">${[r["Objetivo"], r["Key Results"]].filter(Boolean).join(" — ") || "—"}</div>
+      </div>
+    </div>`;
+}
+
+/* ── CHIPS ─────────────────────────────────────────── */
+function buildChips() {
+  function make(field, id, key) {
+    const container = document.getElementById(id);
+    container.innerHTML = "";
+    [...new Set(raw.map(r => r[field]).filter(Boolean))].forEach(v => {
+      const el = document.createElement("span");
+      el.className = "chip";
+      el.innerText  = v;
+      el.onclick = () => {
+        filters[key].has(v) ? filters[key].delete(v) : filters[key].add(v);
+        el.classList.toggle("active");
+        el.style.background = el.classList.contains("active") ? color(v) : "";
+        draw();
+      };
+      container.appendChild(el);
+    });
+  }
+
+  function flagsUI() {
+    const container = document.getElementById("flag");
+    container.innerHTML = "";
+    flags.forEach(f => {
+      const el = document.createElement("span");
+      el.className = "chip";
+      el.innerText  = f;
+      el.onclick = () => {
+        filters.Flags.has(f) ? filters.Flags.delete(f) : filters.Flags.add(f);
+        el.classList.toggle("active");
+        el.style.background = el.classList.contains("active") ? "#157347" : "";
+        draw();
+      };
+      container.appendChild(el);
+    });
+  }
+
+  make("Dominio",   "dom",  "Dominio");
+  make("Capacidad", "cap",  "Capacidad");
+  make("Tipo IA",   "tipo", "TipoIA");
+  flagsUI();
+}
+
+/* ── TABS ──────────────────────────────────────────── */
+function switchTab(t) {
+  document.getElementById("bubbleBox").classList.toggle("hidden", t !== "bubble");
+  document.getElementById("sankeyBox").classList.toggle("hidden", t !== "sankey");
+  document.querySelectorAll(".tab").forEach((el, i) => {
+    el.classList.toggle("active", (t === "bubble" && i === 0) || (t === "sankey" && i === 1));
+  });
+  if (t === "sankey") buildSankey();
+}
+</script>
+
+</body>
+</html>
