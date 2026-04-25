@@ -616,9 +616,10 @@ function buildSankey() {
 
 /* ── DETAIL ────────────────────────────────────────── */
 function show(r) {
+  const c = color(r["Capacidad"]);
   document.getElementById("detail").innerHTML = `
     <div class="detail-header">
-      <div class="case-pill">Caso de Uso</div>
+      <div class="case-pill" style="background:${c}">${r["Capacidad"] || "Caso de Uso"}</div>
       <div class="case-name">${r["Caso"] || "—"}</div>
     </div>
     <div class="detail-body">
