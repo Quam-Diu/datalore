@@ -91,8 +91,6 @@ header {
   opacity: .85;
 }
 
-.upload-wrapper { display: flex; align-items: center; }
-#file { display: none; }
 .upload-btn {
   display: flex; align-items: center; gap: 7px;
   background: rgba(255,255,255,.14);
@@ -371,8 +369,8 @@ header {
 
   <div class="header-center">Casos de Uso · Mapa de Valor</div>
 
-  <label class="upload-btn">
-    <input type="file" id="file" accept=".xlsx,.xls">
+  <input type="file" id="file" accept=".xlsx,.xls" style="display:none">
+  <label for="file" class="upload-btn">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -380,6 +378,7 @@ header {
       <line x1="12" y1="3" x2="12" y2="15"/>
     </svg>
     Cargar Excel
+  </label>
   </label>
 </header>
 
@@ -631,7 +630,7 @@ function buildSankey() {
 
   sankey = new Chart(document.getElementById("sankey"), {
     type: "sankey",
-    data: { datasets: [{ data: links }] },
+    data: { datasets: [{ data: links, colorFrom: "#c8e6d4", colorTo: "#0f5c38" }] },
     options: {
       responsive: true,
       maintainAspectRatio: false,
