@@ -147,6 +147,14 @@ header {
 }
 
 /* ── TABS ────────────────────────────────────────────── */
+.top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
 .tab-bar {
   display: flex;
   align-items: center;
@@ -155,27 +163,26 @@ header {
   border-radius: var(--r);
   padding: 4px;
   box-shadow: var(--shadow-s);
-  flex-shrink: 0;
   gap: 2px;
 }
-
-.tab-spacer { flex: 1; }
 
 .filter-toggle-btn {
   display: flex; align-items: center; gap: 5px;
   font-size: 10px; font-weight: 500;
   color: var(--text-2);
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  padding: 5px 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 6px 12px;
   cursor: pointer;
   font-family: inherit;
   transition: all .18s;
+  box-shadow: var(--shadow-s);
+  white-space: nowrap;
 }
-.filter-toggle-btn:hover { background: var(--bg); border-color: var(--border); }
+.filter-toggle-btn:hover { background: var(--primary-tint); border-color: var(--primary); color: var(--primary); }
 .filter-toggle-btn svg { transition: transform .25s ease; flex-shrink: 0; }
-.filter-toggle-btn.active { color: var(--primary); background: var(--primary-tint); }
+.filter-toggle-btn.active { color: var(--primary); background: var(--primary-tint); border-color: var(--primary); }
 .filter-toggle-btn.collapsed svg { transform: rotate(-90deg); }
 
 .tab {
@@ -387,10 +394,11 @@ header {
   <!-- LEFT PANEL -->
   <div class="panel-left">
 
-    <div class="tab-bar">
-      <button class="tab active" onclick="switchTab('bubble')">Mapa de Burbujas</button>
-      <button class="tab"        onclick="switchTab('sankey')">Diagrama de Flujo</button>
-      <div class="tab-spacer"></div>
+    <div class="top-row">
+      <div class="tab-bar">
+        <button class="tab active" onclick="switchTab('bubble')">Mapa de Burbujas</button>
+        <button class="tab"        onclick="switchTab('sankey')">Diagrama de Flujo</button>
+      </div>
       <button class="filter-toggle-btn active" id="filterToggleBtn" onclick="toggleFilters()">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -452,7 +460,7 @@ header {
 </div>
 
 <script>
-let raw = [], chart, sankey;
+let raw = [], chart, sankey, currentTab = 'bubble';
 
 const palette = ["#157347","#0d6efd","#6610f2","#fd7e14","#dc3545","#20c997"];
 const cmap    = {};
@@ -611,21 +619,18 @@ function draw() {
 function buildSankey() {
   const d = data();
 
-  const links = d.map(r => {
-    const col = color(r["Capacidad"]);
-    return {
-      from:  r["Caso"],
-      to:    r["Capacidad"],
-      flow:  1,
-      color: ctx => {
-        const g = ctx.chart.ctx.createLinearGradient(0, 0, ctx.chart.width, 0);
-        g.addColorStop(0, "#157347");
-        g.addColorStop(1, col);
-        return g;
-      },
-      row: r
-    };
-  });
+  const links = d.map(r => ({
+    from:  r["Caso"],
+    to:    r["Capacidad"],
+    flow:  1,
+    color: ctx => {
+      const g = ctx.chart.ctx.createLinearGradient(0, 0, ctx.chart.width, 0);
+      g.addColorStop(0, "#c8e6d4");   /* verde muy claro — nodos izquierda */
+      g.addColorStop(1, "#0f5c38");   /* verde oscuro    — nodos derecha   */
+      return g;
+    },
+    row: r
+  }));
 
   if (sankey) sankey.destroy();
 
@@ -701,7 +706,7 @@ function buildChips() {
         filters[key].has(v) ? filters[key].delete(v) : filters[key].add(v);
         el.classList.toggle("active");
         el.style.background = el.classList.contains("active") ? color(v) : "";
-        draw();
+        redraw();
       };
       container.appendChild(el);
     });
@@ -718,7 +723,7 @@ function buildChips() {
         filters.Flags.has(f) ? filters.Flags.delete(f) : filters.Flags.add(f);
         el.classList.toggle("active");
         el.style.background = el.classList.contains("active") ? "#157347" : "";
-        draw();
+        redraw();
       };
       container.appendChild(el);
     });
@@ -730,6 +735,11 @@ function buildChips() {
   flagsUI();
 }
 
+function redraw() {
+  if (currentTab === 'bubble') draw();
+  else buildSankey();
+}
+
 /* ── FILTER TOGGLE ─────────────────────────────────── */
 function toggleFilters() {
   document.getElementById("filterPanel").classList.toggle("collapsed");
@@ -738,6 +748,7 @@ function toggleFilters() {
 
 /* ── TABS ──────────────────────────────────────────── */
 function switchTab(t) {
+  currentTab = t;
   document.getElementById("bubbleBox").classList.toggle("hidden", t !== "bubble");
   document.getElementById("sankeyBox").classList.toggle("hidden", t !== "sankey");
   document.querySelectorAll(".tab").forEach((el, i) => {
