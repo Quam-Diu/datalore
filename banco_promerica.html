@@ -149,15 +149,39 @@ header {
 /* ── TABS ────────────────────────────────────────────── */
 .tab-bar {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 4px;
   box-shadow: var(--shadow-s);
-  width: fit-content;
   flex-shrink: 0;
-  gap: 2px;
+  gap: 4px;
 }
+
+.tab-group { display: flex; gap: 2px; }
+
+.filter-toggle-btn {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 500;
+  color: var(--text-2);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 5px 11px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .18s;
+  margin-left: 4px;
+}
+.filter-toggle-btn:hover { background: var(--bg); border-color: var(--border); }
+.filter-toggle-btn svg {
+  transition: transform .25s ease;
+  flex-shrink: 0;
+}
+.filter-toggle-btn.active { color: var(--primary); background: var(--primary-tint); }
+.filter-toggle-btn.active svg { transform: rotate(180deg); }
 
 .tab {
   font-size: 11px; font-weight: 500;
@@ -194,39 +218,20 @@ header {
 
 /* ── FILTER PANEL ────────────────────────────────────── */
 .filter-panel {
-  padding: 0;
+  padding: 10px 14px 12px;
   flex-shrink: 1;
   overflow: hidden;
-  transition: max-height .3s ease, opacity .3s ease;
+  transition: max-height .3s ease, padding .3s ease, opacity .25s ease;
   max-height: 400px;
   opacity: 1;
 }
 .filter-panel.collapsed {
-  max-height: 36px;
-  opacity: 1;
-}
-
-.filter-toggle {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 14px;
-  cursor: pointer;
-  user-select: none;
-}
-.filter-toggle-label {
-  font-size: 9px; font-weight: 700;
-  color: var(--text-3); text-transform: uppercase; letter-spacing: 1.1px;
-}
-.filter-toggle-icon {
-  color: var(--text-3);
-  transition: transform .25s ease;
-  line-height: 1;
-  font-size: 12px;
-}
-.filter-panel.collapsed .filter-toggle-icon { transform: rotate(-90deg); }
-
-.filter-body {
-  padding: 0 14px 12px;
-  overflow-y: auto;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .filter-grid {
@@ -388,8 +393,17 @@ header {
   <div class="panel-left">
 
     <div class="tab-bar">
-      <button class="tab active" onclick="switchTab('bubble')">Mapa de Burbujas</button>
-      <button class="tab"        onclick="switchTab('sankey')">Diagrama de Flujo</button>
+      <div class="tab-group">
+        <button class="tab active" onclick="switchTab('bubble')">Mapa de Burbujas</button>
+        <button class="tab"        onclick="switchTab('sankey')">Diagrama de Flujo</button>
+      </div>
+      <button class="filter-toggle-btn active" id="filterToggleBtn" onclick="toggleFilters()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        Filtros
+      </button>
     </div>
 
     <div class="card chart-wrap" id="bubbleBox">
@@ -400,28 +414,22 @@ header {
     </div>
 
     <div class="card filter-panel" id="filterPanel">
-      <div class="filter-toggle" onclick="toggleFilters()">
-        <span class="filter-toggle-label">Filtros</span>
-        <span class="filter-toggle-icon">&#9660;</span>
-      </div>
-      <div class="filter-body">
-        <div class="filter-grid">
-          <div class="filter-group">
-            <div class="filter-label">Capacidad</div>
-            <div id="cap" class="chips"></div>
-          </div>
-          <div class="filter-group">
-            <div class="filter-label">Impacto</div>
-            <div id="flag" class="chips"></div>
-          </div>
-          <div class="filter-group">
-            <div class="filter-label">Tipo IA</div>
-            <div id="tipo" class="chips"></div>
-          </div>
-          <div class="filter-group">
-            <div class="filter-label">Dominio</div>
-            <div id="dom" class="chips"></div>
-          </div>
+      <div class="filter-grid">
+        <div class="filter-group">
+          <div class="filter-label">Capacidad</div>
+          <div id="cap" class="chips"></div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Impacto</div>
+          <div id="flag" class="chips"></div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Tipo IA</div>
+          <div id="tipo" class="chips"></div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Dominio</div>
+          <div id="dom" class="chips"></div>
         </div>
       </div>
     </div>
@@ -731,6 +739,7 @@ function buildChips() {
 /* ── FILTER TOGGLE ─────────────────────────────────── */
 function toggleFilters() {
   document.getElementById("filterPanel").classList.toggle("collapsed");
+  document.getElementById("filterToggleBtn").classList.toggle("active");
 }
 
 /* ── TABS ──────────────────────────────────────────── */
