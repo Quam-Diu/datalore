@@ -194,8 +194,38 @@ header {
 
 /* ── FILTER PANEL ────────────────────────────────────── */
 .filter-panel {
-  padding: 10px 14px 12px;
+  padding: 0;
   flex-shrink: 1;
+  overflow: hidden;
+  transition: max-height .3s ease, opacity .3s ease;
+  max-height: 400px;
+  opacity: 1;
+}
+.filter-panel.collapsed {
+  max-height: 36px;
+  opacity: 1;
+}
+
+.filter-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.filter-toggle-label {
+  font-size: 9px; font-weight: 700;
+  color: var(--text-3); text-transform: uppercase; letter-spacing: 1.1px;
+}
+.filter-toggle-icon {
+  color: var(--text-3);
+  transition: transform .25s ease;
+  line-height: 1;
+  font-size: 12px;
+}
+.filter-panel.collapsed .filter-toggle-icon { transform: rotate(-90deg); }
+
+.filter-body {
+  padding: 0 14px 12px;
   overflow-y: auto;
 }
 
@@ -369,23 +399,29 @@ header {
       <canvas id="sankey"></canvas>
     </div>
 
-    <div class="card filter-panel">
-      <div class="filter-grid">
-        <div class="filter-group">
-          <div class="filter-label">Dominio</div>
-          <div id="dom" class="chips"></div>
-        </div>
-        <div class="filter-group">
-          <div class="filter-label">Capacidad</div>
-          <div id="cap" class="chips"></div>
-        </div>
-        <div class="filter-group">
-          <div class="filter-label">Tipo IA</div>
-          <div id="tipo" class="chips"></div>
-        </div>
-        <div class="filter-group">
-          <div class="filter-label">Impacto</div>
-          <div id="flag" class="chips"></div>
+    <div class="card filter-panel" id="filterPanel">
+      <div class="filter-toggle" onclick="toggleFilters()">
+        <span class="filter-toggle-label">Filtros</span>
+        <span class="filter-toggle-icon">&#9660;</span>
+      </div>
+      <div class="filter-body">
+        <div class="filter-grid">
+          <div class="filter-group">
+            <div class="filter-label">Capacidad</div>
+            <div id="cap" class="chips"></div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-label">Impacto</div>
+            <div id="flag" class="chips"></div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-label">Tipo IA</div>
+            <div id="tipo" class="chips"></div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-label">Dominio</div>
+            <div id="dom" class="chips"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -690,6 +726,11 @@ function buildChips() {
   make("Capacidad", "cap",  "Capacidad");
   make("Tipo IA",   "tipo", "TipoIA");
   flagsUI();
+}
+
+/* ── FILTER TOGGLE ─────────────────────────────────── */
+function toggleFilters() {
+  document.getElementById("filterPanel").classList.toggle("collapsed");
 }
 
 /* ── TABS ──────────────────────────────────────────── */
