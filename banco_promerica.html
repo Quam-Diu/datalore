@@ -92,7 +92,7 @@ header {
 }
 
 .upload-wrapper { display: flex; align-items: center; }
-#file { position: fixed; top: -300px; left: -300px; width: 1px; height: 1px; opacity: 0; }
+#file { display: none; }
 .upload-btn {
   display: flex; align-items: center; gap: 7px;
   background: rgba(255,255,255,.14);
@@ -371,18 +371,16 @@ header {
 
   <div class="header-center">Casos de Uso · Mapa de Valor</div>
 
-  <div class="upload-wrapper">
+  <label class="upload-btn">
     <input type="file" id="file" accept=".xlsx,.xls">
-    <label for="file" class="upload-btn">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="17 8 12 3 7 8"/>
-        <line x1="12" y1="3" x2="12" y2="15"/>
-      </svg>
-      Cargar Excel
-    </label>
-  </div>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    Cargar Excel
+  </label>
 </header>
 
 <!-- ── MAIN ────────────────────────────────────────── -->
