@@ -91,11 +91,8 @@ header {
   opacity: .85;
 }
 
-.upload-wrapper { position: relative; }
-.upload-wrapper input[type="file"] {
-  position: absolute; inset: 0;
-  opacity: 0; cursor: pointer; width: 100%;
-}
+.upload-wrapper { display: flex; align-items: center; }
+#file { position: fixed; top: -300px; left: -300px; width: 1px; height: 1px; opacity: 0; }
 .upload-btn {
   display: flex; align-items: center; gap: 7px;
   background: rgba(255,255,255,.14);
@@ -106,11 +103,11 @@ header {
   font-size: 11px; font-weight: 600;
   letter-spacing: .3px;
   transition: background .2s;
-  pointer-events: none;
+  cursor: pointer;
   white-space: nowrap;
+  user-select: none;
 }
-.upload-wrapper:hover .upload-btn { background: rgba(255,255,255,.24); }
-
+.upload-btn:hover { background: rgba(255,255,255,.24); }
 .upload-btn svg { flex-shrink: 0; }
 
 /* ── MAIN LAYOUT ─────────────────────────────────────── */
@@ -376,7 +373,7 @@ header {
 
   <div class="upload-wrapper">
     <input type="file" id="file" accept=".xlsx,.xls">
-    <div class="upload-btn">
+    <label for="file" class="upload-btn">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -384,7 +381,7 @@ header {
         <line x1="12" y1="3" x2="12" y2="15"/>
       </svg>
       Cargar Excel
-    </div>
+    </label>
   </div>
 </header>
 
