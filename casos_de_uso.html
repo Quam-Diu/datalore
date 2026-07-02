@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Casos de Uso IA - Mayo 2026</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jointjs@3.7.7/dist/joint.min.css">
+<style>
+:root {--primary:#157347;--primary-dark:#0f5c38;--primary-mid:#2d9662;--primary-tint:#e6f2ec;--bg:#eef2f0;--surface:#ffffff;--border:#dde6e2;--text-1:#1b2e24;--text-2:#4a6b5a;--shadow-s:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--r:10px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text-1);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:linear-gradient(120deg,var(--primary-dark) 0%,var(--primary) 55%,var(--primary-mid) 100%);color:#fff;height:58px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(15,92,56,.4)}
+.brand{display:flex;gap:11px;align-items:center}.brand-icon{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.32);display:grid;place-items:center;font-size:13px;font-weight:800}
+.brand-name{font-size:14px;font-weight:700}.brand-sub{font-size:10px;opacity:.65}
+.main{flex:1;padding:14px 16px;min-height:0}
+.card{height:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-s);display:flex;flex-direction:column;min-height:0}
+.slideWrap{flex:1;padding:18px;overflow:auto}.slide{display:none}.slide.active{display:block}.slide h2{font-size:28px;margin-bottom:12px}.muted{color:var(--text-2)}
+.stepFigure{margin:8px auto 0;display:flex;justify-content:center}.stepFigure img{display:block;width:min(100%,760px);max-height:34vh;object-fit:contain;height:auto;border:none;border-radius:10px;background:#fff}
+.insightBlock{margin-top:10px;padding:10px;border:none;border-radius:10px;background:#fff}.insightBlock p{font-weight:700;margin-bottom:4px;font-size:16px}.insightBlock ul{margin:0;padding-left:18px;font-size:15px;line-height:1.45}
+.pill{font-size:12px;padding:7px 10px;border-radius:18px;border:1px solid var(--border);background:#fff;cursor:pointer;margin:3px}
+.detail{margin-top:8px;padding:10px;border:1px dashed var(--border);border-radius:8px;background:#fff;min-height:70px}
+ul{padding-left:18px;line-height:1.6}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-top:1px solid var(--border)}
+button{border:1px solid var(--border);background:#fff;border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{background:var(--primary-tint);border-color:var(--primary)}
+
+/* Agrupación slide */
+.ag-container{display:flex;gap:16px;height:100%}
+.ag-tree{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.ag-desc-panel{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
+.ag-group{border-radius:8px;overflow:hidden}
+.ag-header{display:flex;align-items:center;gap:6px;padding:5px 10px;cursor:pointer;user-select:none;color:#fff}
+.ag-header:hover{filter:brightness(1.1)}
+.ag-toggle-btn{width:16px;height:16px;border-radius:3px;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;line-height:1}
+.ag-num{font-size:13px;font-weight:800;opacity:0.85;min-width:16px}
+.ag-gname{font-size:12px;font-weight:700;letter-spacing:0.02em}
+.ag-items{padding:2px 0 2px 6px;display:flex;flex-direction:column;gap:1px;background:rgba(0,0,0,0.03)}
+.ag-sub{border-radius:5px;overflow:hidden}
+.ag-sub-hdr{display:flex;align-items:center;gap:5px;padding:3px 6px;cursor:pointer;border-radius:4px}
+.ag-sub-hdr:hover{background:rgba(0,0,0,0.05)}
+.ag-sub-toggle{width:13px;height:13px;border-radius:2px;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;line-height:1}
+.ag-sub-name{font-size:11px;font-weight:600;color:var(--text-1)}
+.ag-originals{padding:1px 0 1px 24px;display:flex;flex-direction:column;gap:0}
+.ag-orig{font-size:10px;color:var(--text-2);padding:1px 0;display:flex;align-items:center;gap:6px}
+.ag-orig::before{content:'';width:12px;height:1px;background:currentColor;opacity:0.3;flex-shrink:0}
+.ag-desc-box{border-radius:6px;padding:7px 10px;font-size:10.5px;line-height:1.5;color:#fff;display:none}
+.ag-desc-box.visible{display:block}
+
+.decision-card{
+  background:linear-gradient(#fff,#fff) padding-box,
+              linear-gradient(135deg,#157347 0%,#9dccb5 100%) border-box !important;
+  border:1.5px solid transparent !important;
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="brand-icon">IA</div>
+    <div>
+      <div class="brand-name">Casos de Uso</div>
+      <div class="brand-sub">Gerencia de Analítica e Inteligencia de Datos</div>
+    </div>
+  </div>
+  <div>Mayo 2026</div>
+</header>
+
+<div class="main">
+  <div class="card">
+    <div class="slideWrap">
+
+      <!-- SLIDE 1: Title -->
+      <section class="slide active">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;">
+          <h2 style="font-size:42px;font-weight:800;color:#157347;margin-bottom:16px;">Casos de Uso de IA</h2>
+          <p class="muted" style="font-size:18px;">Gerencia de Analítica e Inteligencia de Datos · Mayo 2026</p>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: Punto de partida -->
+      <section class="slide">
+        <h2>Punto de partida - ¿Qué se hizo?</h2>
+        <figure class="stepFigure">
+          <img src="Diapositiva_2.png" alt="Diagrama de punto de partida con secuencia de recolección, evaluación y consolidación" />
+        </figure>
+        <div class="insightBlock">
+          <p>Insight:</p>
+          <ul>
+            <li>Patrones repetidos en decisiones sobre el cliente.</li>
+            <li>Dependencias entre casos.</li>
+            <li>Fragmentación reduce impacto, y genera riesgo de incongruencia.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: Orquestador -->
+      <section class="slide">
+        <h2>¿Qué es el Orquestador?</h2>
+        <p class="muted">Capa transversal que permite definir ¿a quién contactar?, ¿cómo responder?, mensaje, canal y momento.</p>
+
+        <div id="flow" style="display:flex;align-items:stretch;gap:0;height:210px;width:100%;margin-top:8px;">
+
+          <div class="fcard" data-step="0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;border-radius:10px;background:#fff;cursor:pointer;">
+            <img src="Datos.png" style="width:100px;height:100px;object-fit:contain;flex-shrink:0;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.05em;color:#1b2e24;margin-top:6px;text-align:center;">DATOS</div>
+            <div style="font-size:10px;color:#4a6b5a;text-align:center;margin-top:3px;line-height:1.35;">Información del<br>cliente y contexto</div>
+          </div>
+
+          <div class="fcard" data-step="1" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;border-radius:10px;background:#fff;cursor:default;opacity:0;transition:opacity 0.4s;">
+            <img src="Perfil.png" style="width:100px;height:100px;object-fit:contain;flex-shrink:0;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.05em;color:#1b2e24;margin-top:6px;text-align:center;">PERFILES</div>
+            <div style="font-size:10px;color:#4a6b5a;text-align:center;margin-top:3px;line-height:1.35;">Insumo para<br>orquestación y<br>priorización</div>
+          </div>
+
+          <div class="fcard decision-card" data-step="2" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;border-radius:10px;background:#fff;cursor:default;opacity:0;transition:opacity 0.4s;">
+            <img src="Decision.png" style="width:100px;height:100px;object-fit:contain;flex-shrink:0;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.05em;color:#1b2e24;margin-top:6px;text-align:center;">DECISIÓN</div>
+            <div style="font-size:10px;color:#4a6b5a;text-align:center;margin-top:3px;line-height:1.35;">Ejecución en<br>canales y sistemas</div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+            <div class="fcard" data-step="3" style="flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;padding:4px 6px;border-radius:10px;background:#fff;cursor:default;opacity:0;transition:opacity 0.4s;">
+              <img src="Outbound.png" style="width:64px;height:64px;object-fit:contain;flex-shrink:0;">
+              <div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:0.05em;color:#1b2e24;">OUTBOUND</div>
+                <div style="font-size:10px;color:#4a6b5a;margin-top:3px;line-height:1.35;">Orquestador<br>de Campañas</div>
+              </div>
+            </div>
+            <div class="fcard" data-step="3" style="flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;padding:4px 6px;border-radius:10px;background:#fff;cursor:default;opacity:0;transition:opacity 0.4s;">
+              <img src="Inbound.png" style="width:64px;height:64px;object-fit:contain;flex-shrink:0;">
+              <div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:0.05em;color:#1b2e24;">INBOUND</div>
+                <div style="font-size:10px;color:#4a6b5a;margin-top:3px;line-height:1.35;">Asistente<br>de Gestiones</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SLIDE 4: Secuencia de valor -->
+      <section class="slide">
+        <h2>Secuencia de valor</h2>
+        <p>
+          <button class="pill" data-k="pt">Perfil Transaccional</button>
+          <button class="pill" data-k="pr">Perfil Relacional</button>
+          <button class="pill" data-k="oc">Orquestador Comercial</button>
+          <button class="pill" data-k="camp">Orquestador de Campañas</button>
+          <button class="pill" data-k="asg">Asistente de Gestiones</button>
+          <button class="pill" data-k="auto">Automatización Operativa</button>
+          <button class="pill" data-k="esp">Casos Especializados</button>
+        </p>
+        <div class="detail" id="detail">Haz click en un elemento para ver su detalle.</div>
+      </section>
+
+      <!-- SLIDE 5: Agrupación -->
+      <section class="slide">
+        <h2 style="margin-bottom:6px;">Casos de Uso — Agrupación</h2>
+        <div class="ag-container">
+
+          <div class="ag-tree">
+
+            <!-- GROUP 1: Perfil Transaccional -->
+            <div class="ag-group" id="ag1">
+              <div class="ag-header" style="background:#6B3FA0" onclick="agToggleGroup(1)">
+                <div class="ag-toggle-btn" id="ag1-btn">−</div>
+                <span class="ag-num">1</span>
+                <span class="ag-gname">Perfil Transaccional</span>
+              </div>
+              <div class="ag-items" id="ag1-body">
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('1-1')" style="color:#6B3FA0">
+                    <div class="ag-sub-toggle" id="ag1-1-btn">+</div>
+                    <span class="ag-sub-name">Alertas KYC</span>
+                  </div>
+                  <div class="ag-originals" id="ag1-1-orig" style="display:none">
+                    <div class="ag-orig">BE_1_Perfil_TRX</div>
+                    <div class="ag-orig">OC_1 Monitoreo</div>
+                  </div>
+                </div>
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('1-2')" style="color:#6B3FA0">
+                    <div class="ag-sub-toggle" id="ag1-2-btn">+</div>
+                    <span class="ag-sub-name">Tipo de cambio</span>
+                  </div>
+                  <div class="ag-originals" id="ag1-2-orig" style="display:none">
+                    <div class="ag-orig">BE_3 Tipo_cambio</div>
+                    <div class="ag-orig">OP_2 Tipo_Cambio</div>
+                  </div>
+                </div>
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('1-3')" style="color:#6B3FA0">
+                    <div class="ag-sub-toggle" id="ag1-3-btn">+</div>
+                    <span class="ag-sub-name">Cobranza</span>
+                  </div>
+                  <div class="ag-originals" id="ag1-3-orig" style="display:none">
+                    <div class="ag-orig">CB_1 Alerta_Temprana</div>
+                    <div class="ag-orig">CB_2 Perfil_Conductual</div>
+                  </div>
+                </div>
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('1-4')" style="color:#6B3FA0">
+                    <div class="ag-sub-toggle" id="ag1-4-btn">+</div>
+                    <span class="ag-sub-name">Transferencias</span>
+                  </div>
+                  <div class="ag-originals" id="ag1-4-orig" style="display:none">
+                    <div class="ag-orig">OC_2 Perfil</div>
+                  </div>
+                </div>
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('1-5')" style="color:#6B3FA0">
+                    <div class="ag-sub-toggle" id="ag1-5-btn">+</div>
+                    <span class="ag-sub-name">Antifraude / Autorizaciones</span>
+                  </div>
+                  <div class="ag-originals" id="ag1-5-orig" style="display:none">
+                    <div class="ag-orig">GR_1 Antifraude</div>
+                    <div class="ag-orig">OP_3 Autorizaciones</div>
+                  </div>
+                </div>
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('1-6')" style="color:#6B3FA0">
+                    <div class="ag-sub-toggle" id="ag1-6-btn">+</div>
+                    <span class="ag-sub-name">Perfil Transaccional</span>
+                  </div>
+                  <div class="ag-originals" id="ag1-6-orig" style="display:none">
+                    <div class="ag-orig">Arya - ProIngenius</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- GROUP 2: Perfil Relacional -->
+            <div class="ag-group" id="ag2">
+              <div class="ag-header" style="background:#2563A8" onclick="agToggleGroup(2)">
+                <div class="ag-toggle-btn" id="ag2-btn">+</div>
+                <span class="ag-num">2</span>
+                <span class="ag-gname">Perfil Relacional</span>
+              </div>
+              <div class="ag-items" id="ag2-body" style="display:none">
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('2-1')" style="color:#2563A8">
+                    <div class="ag-sub-toggle" id="ag2-1-btn">+</div>
+                    <span class="ag-sub-name">Perfil Relacional</span>
+                  </div>
+                  <div class="ag-originals" id="ag2-1-orig" style="display:none">
+                    <div class="ag-orig">(sin casos originales registrados)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- GROUP 3: Orquestador Comercial -->
+            <div class="ag-group" id="ag3">
+              <div class="ag-header" style="background:#157347" onclick="agToggleGroup(3)">
+                <div class="ag-toggle-btn" id="ag3-btn">+</div>
+                <span class="ag-num">3</span>
+                <span class="ag-gname">Orquestador Comercial</span>
+              </div>
+              <div class="ag-items" id="ag3-body" style="display:none">
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('3-1')" style="color:#157347">
+                    <div class="ag-sub-toggle" id="ag3-1-btn">+</div>
+                    <span class="ag-sub-name">Orquestador campañas</span>
+                  </div>
+                  <div class="ag-originals" id="ag3-1-orig" style="display:none">
+                    <div class="ag-orig">MK_1 Inteligencia_MK</div>
+                    <div class="ag-orig">BP_1 Leads</div>
+                    <div class="ag-orig">BP_2 Campañas</div>
+                    <div class="ag-orig">BP_3 Asistente</div>
+                  </div>
+                </div>
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('3-2')" style="color:#157347">
+                    <div class="ag-sub-toggle" id="ag3-2-btn">+</div>
+                    <span class="ag-sub-name">Asistente de gestiones</span>
+                  </div>
+                  <div class="ag-originals" id="ag3-2-orig" style="display:none">
+                    <div class="ag-orig">BE_2_Triage</div>
+                    <div class="ag-orig">OP_1 Contracargos</div>
+                    <div class="ag-orig">PR_Whatsapp</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- GROUP 4: Automatización Operativa -->
+            <div class="ag-group" id="ag4">
+              <div class="ag-header" style="background:#D4660A" onclick="agToggleGroup(4)">
+                <div class="ag-toggle-btn" id="ag4-btn">+</div>
+                <span class="ag-num">4</span>
+                <span class="ag-gname">Automatización Operativa</span>
+              </div>
+              <div class="ag-items" id="ag4-body" style="display:none">
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('4-1')" style="color:#D4660A">
+                    <div class="ag-sub-toggle" id="ag4-1-btn">+</div>
+                    <span class="ag-sub-name">Talentia</span>
+                  </div>
+                  <div class="ag-originals" id="ag4-1-orig" style="display:none">
+                    <div class="ag-orig">TH_1_Talentia</div>
+                  </div>
+                </div>
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('4-2')" style="color:#D4660A">
+                    <div class="ag-sub-toggle" id="ag4-2-btn">+</div>
+                    <span class="ag-sub-name">Agente de seguimiento</span>
+                  </div>
+                  <div class="ag-originals" id="ag4-2-orig" style="display:none">
+                    <div class="ag-orig">GR_3 Agente_RK</div>
+                    <div class="ag-orig">PM_1 Seguimiento_OKRs</div>
+                    <div class="ag-orig">GC_1 Agente_Compliance</div>
+                  </div>
+                </div>
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('4-3')" style="color:#D4660A">
+                    <div class="ag-sub-toggle" id="ag4-3-btn">+</div>
+                    <span class="ag-sub-name">Stress Test</span>
+                  </div>
+                  <div class="ag-originals" id="ag4-3-orig" style="display:none">
+                    <div class="ag-orig">GR_2 Stress Test</div>
+                  </div>
+                </div>
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('4-4')" style="color:#D4660A">
+                    <div class="ag-sub-toggle" id="ag4-4-btn">+</div>
+                    <span class="ag-sub-name">Bench Bancos</span>
+                  </div>
+                  <div class="ag-originals" id="ag4-4-orig" style="display:none">
+                    <div class="ag-orig">PY_1 Bench_Bancos</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- GROUP 5: Cognition / TI -->
+            <div class="ag-group" id="ag5">
+              <div class="ag-header" style="background:#1A6B8A" onclick="agToggleGroup(5)">
+                <div class="ag-toggle-btn" id="ag5-btn">+</div>
+                <span class="ag-num">5</span>
+                <span class="ag-gname">Cognition / TI</span>
+              </div>
+              <div class="ag-items" id="ag5-body" style="display:none">
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('5-1')" style="color:#1A6B8A">
+                    <div class="ag-sub-toggle" id="ag5-1-btn">+</div>
+                    <span class="ag-sub-name">Migración a Fabric</span>
+                  </div>
+                  <div class="ag-originals" id="ag5-1-orig" style="display:none">
+                    <div class="ag-orig">RD_1 Discoverer</div>
+                    <div class="ag-orig">RD_2 Repor_Server</div>
+                    <div class="ag-orig">RD_3 SDS</div>
+                    <div class="ag-orig">RD_4 Pipelines</div>
+                    <div class="ag-orig">RD_5 Cubos</div>
+                    <div class="ag-orig">RD_6 Contacto</div>
+                  </div>
+                </div>
+                <div class="ag-sub">
+                  <div class="ag-sub-hdr" onclick="agToggleSub('5-2')" style="color:#1A6B8A">
+                    <div class="ag-sub-toggle" id="ag5-2-btn">+</div>
+                    <span class="ag-sub-name">Product Builders</span>
+                  </div>
+                  <div class="ag-originals" id="ag5-2-orig" style="display:none">
+                    <div class="ag-orig">PR_1 Builder</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /ag-tree -->
+
+          <!-- Description panel -->
+          <div class="ag-desc-panel">
+            <div class="ag-desc-box visible" id="desc1" style="background:#6B3FA0;">
+              <strong style="display:block;margin-bottom:6px;">Perfil Transaccional</strong>
+              Alto valor económico e impacto en NPS. Se cuenta con datos. No requieren integraciones (al menos inicialmente) y son habilitadores del 'Orquestador Comercial'.
+            </div>
+            <div class="ag-desc-box" id="desc2" style="background:#2563A8;">
+              <strong style="display:block;margin-bottom:6px;">Perfil Relacional</strong>
+              No solicitado explícitamente, pero requerido para una orquestación efectiva. Desarrollo desde cero.
+            </div>
+            <div class="ag-desc-box" id="desc3" style="background:#157347;">
+              <strong style="display:block;margin-bottom:6px;">Orquestador Comercial</strong>
+              Alto valor económico + impacto en NPS. Depende de datos que no tenemos al 100%. Requiere integraciones.
+            </div>
+            <div class="ag-desc-box" id="desc4" style="background:#D4660A;">
+              <strong style="display:block;margin-bottom:6px;">Automatización Operativa</strong>
+              Finalizar Talentia (90% listo). El resto requiere integraciones y posiblemente LLMs internos. Valor en reducción de gastos operativos.
+            </div>
+            <div class="ag-desc-box" id="desc5" style="background:#1A6B8A;">
+              <strong style="display:block;margin-bottom:6px;">Cognition / TI</strong>
+              Habilitador de la plataforma de datos y para el equipo de Productos.
+            </div>
+          </div>
+
+        </div><!-- /ag-container -->
+      </section>
+
+    </div>
+    <div class="nav">
+      <button id="prev">◀ Anterior</button>
+      <span id="counter">1 / 5</span>
+      <button id="next">Siguiente ▶</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/backbone@1.6.1/backbone-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jointjs@3.7.7/dist/joint.min.js"></script>
+<script>
+(()=>{
+  const slides = [...document.querySelectorAll('.slide')];
+  let i = 0;
+  const counter  = document.getElementById('counter');
+  const prevBtn  = document.getElementById('prev');
+  const nextBtn  = document.getElementById('next');
+
+  const show = n => {
+    i = (n + slides.length) % slides.length;
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    counter.textContent = `${i + 1} / ${slides.length}`;
+  };
+
+  show(0);
+  prevBtn.addEventListener('click', () => show(i - 1));
+  nextBtn.addEventListener('click', () => show(i + 1));
+  addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') show(i + 1);
+    if (e.key === 'ArrowLeft')  show(i - 1);
+  });
+
+  /* Pill detail map */
+  const map = {
+    pt:   'Permite entender comportamiento transaccional, financiero y de riesgo.',
+    pr:   'Captura preferencia, frecuencia, secuencia y contexto relacional.',
+    oc:   'A quién contactar, cómo responder, mensaje, canal y momento.',
+    camp: 'Comunicación proactiva y personalizada.',
+    asg:  'Atención y resolución de solicitudes.',
+    auto: 'Eliminación de tareas repetitivas y seguimiento de planes.',
+    esp:  'Generación de código para migración a Fabric y prototipado.'
+  };
+  document.querySelectorAll('.pill').forEach(b =>
+    b.onclick = () => { document.getElementById('detail').textContent = map[b.dataset.k]; }
+  );
+
+  /* Flow diagram click-reveal */
+  (() => {
+    let step = 1;
+    const allCards = [...document.querySelectorAll('#flow .fcard[data-step]')];
+
+    function reveal(s) {
+      allCards.filter(c => +c.dataset.step === s).forEach(c => { c.style.opacity = '1'; });
+    }
+
+    function bindClick(s) {
+      allCards.filter(c => +c.dataset.step === s).forEach(c => {
+        c.style.cursor = 'pointer';
+        c.addEventListener('click', function handler() {
+          if (step !== s + 1) return;
+          step++;
+          reveal(step - 1);
+          if (step <= 3) bindClick(step - 1);
+          c.style.cursor = 'default';
+        });
+      });
+    }
+
+    bindClick(0);
+  })();
+})();
+
+/* Agrupación slide — group toggle */
+function agToggleGroup(n) {
+  const body = document.getElementById('ag' + n + '-body');
+  const btn  = document.getElementById('ag' + n + '-btn');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : '';
+  btn.textContent    = isOpen ? '+' : '−';
+  /* Always show the clicked group's description */
+  document.querySelectorAll('.ag-desc-box').forEach(el => { el.style.display = 'none'; });
+  document.getElementById('desc' + n).style.display = 'block';
+}
+
+/* Agrupación slide — sub-item toggle */
+function agToggleSub(id) {
+  const orig   = document.getElementById('ag' + id + '-orig');
+  const btn    = document.getElementById('ag' + id + '-btn');
+  const isOpen = orig.style.display !== 'none';
+  orig.style.display = isOpen ? 'none' : '';
+  btn.textContent    = isOpen ? '+' : '−';
+}
+</script>
+</body>
+</html>
